@@ -83,14 +83,16 @@ class OpTextfield extends StatelessWidget {
               autocorrect: type == OpTextFieldTypes.password ? false : true,
               obscureText: type == OpTextFieldTypes.password ? true : false,
               onChanged: (String value) => onChange(value),
-              style:
-                  Theme.of(context).textTheme.headline6?.copyWith(fontSize: 15),
+              style: Theme.of(context).textTheme.headline6?.copyWith(
+                    fontSize: 15,
+                    color: Theme.of(context).backgroundColor,
+                  ),
               decoration: InputDecoration(
                 hintText: hintText ?? "",
                 hintStyle: hintStyle ??
                     Theme.of(context).textTheme.headline6?.copyWith(
                           fontSize: 15,
-                          color: Colors.white,
+                          color: Theme.of(context).backgroundColor,
                         ),
                 border: InputBorder.none,
               ),

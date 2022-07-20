@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   AppTheme._();
+  BuildContext? context;
 
   // static final ThemeData light = ThemeData(
   //   brightness: Brightness.light,
@@ -33,5 +34,9 @@ class AppTheme {
       brightness: Brightness.dark,
       secondary: const Color(0xff4a4a58),
     ),
+    // textTheme: Theme.of(context).textTheme.apply(
+    //       bodyColor: Colors.pinkAccent, //<-- SEE HERE
+    //       displayColor: Colors.pinkAccent, //<-- SEE HERE
+    //     ),
   );
 }
