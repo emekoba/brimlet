@@ -1,3 +1,4 @@
+import 'package:brimlet/services/firebase.service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -14,13 +15,19 @@ class AuthenticationWrapper extends StatefulWidget {
 }
 
 class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
+  FbAuthStates authState = FbAuthStates.signedOut;
+
   @override
   void initState() {
     FirebaseAuth.instance.userChanges().listen((User? user) {
       if (user == null) {
-        print('User is currently signed out!');
+        setState(() {
+          authState = FbAuthStates.signedOut;
+        });
       } else {
-        print('User is signed in!');
+        setState(() {
+          authState = FbAuthStates.signedIn;
+        });
       }
     });
 
@@ -29,6 +36,6 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    return const Offstage();
+    return widget.builder(authState);
   }
 }
