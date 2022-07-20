@@ -69,7 +69,6 @@ class OpTextfield extends StatelessWidget {
           useIcon == true
               ? Icon(
                   resolveTextFieldIcon(),
-                  color: Colors.white,
                 )
               : Container(),
           const SizedBox(width: 10),
