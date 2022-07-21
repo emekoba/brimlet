@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:brimlet/services/firebase.service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,16 +13,15 @@ class MainBloc extends ChangeNotifier {
     required String email,
     required String password,
   }) async {
-    firebaseAuth
-        .signInWithEmailAndPassword(email: email, password: password)
-        .then((registrant) {})
-        .catchError((dynamic e) {
-      log(e);
-    });
+    try {
+      firebaseAuth
+          .signInWithEmailAndPassword(email: email, password: password)
+          .then((loginData) {});
 
-    return {
-      "success": true,
-    };
+      return {"success": true};
+    } catch (e) {
+      return {"success": false};
+    }
   }
 
   Future<Map<String, bool>> ffLogout() async {
@@ -34,30 +31,30 @@ class MainBloc extends ChangeNotifier {
         _userName = "";
         notifyListeners();
       });
-      return {"success": false};
+      return {"success": true};
     } catch (e) {
       return {"success": false};
     }
   }
 
-  Future<Map<String, bool>> ffRegisterUser({
+  Future ffRegisterUser({
     required String name,
     required String email,
     required String password,
-  }) async {
-    try {
-      FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password)
-          .then((regData) {
-        regData.user!.updateDisplayName(name);
-        _userName = name;
-        notifyListeners();
-      }).catchError((dynamic e) {
-        log(e);
-      });
-      return {"success": false};
-    } catch (e) {
-      return {"success": false};
-    }
+  }) {
+    return FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email, password: password)
+        .then((regData) {
+      User user = regData.user!;
+      user.updateDisplayName(name);
+      if (!user.emailVerified) {
+        print("not verified");
+      }
+
+      _userName = name;
+      notifyListeners();
+    }).catchError((onError) {
+      print(onError);
+    });
   }
 }

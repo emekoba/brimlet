@@ -6,3 +6,4 @@ enum FbAuthStates {
 }
 
 FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+User? firebaseUser = FirebaseAuth.instance.currentUser;

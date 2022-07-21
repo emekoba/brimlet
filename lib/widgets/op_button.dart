@@ -28,14 +28,13 @@ class OpButton extends StatelessWidget {
         backgroundColor: MaterialStateProperty.all<Color>(Colors.redAccent),
         minimumSize: MaterialStateProperty.all<Size>(Size(width, height)),
       ),
-
-      // TextButton.styleFrom(
-      //   primary: Colors.white,
-      //   backgroundColor: const Color(0xff05afff),
-      //   onSurface: Colors.grey,
-      //   minimumSize: Size(width, height),
-      // ),
-      child: Text(label),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
 }
