@@ -73,9 +73,9 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     void _loginViaBiometrics() async {
-      bool isAuthenticated = await mainBloc.authenticateWithBiometrics();
+      Map<String, dynamic> resp = await mainBloc.authenticateWithBiometrics();
 
-      if (isAuthenticated) {
+      if (resp["isAuthenticated"]) {
         popSnack(
           context: context,
           text: "Sign In Successful",
@@ -83,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
         );
         _goToHome();
       } else {
-        popSnack(context: context, text: "Sign In Failed");
+        popSnack(context: context, text: resp["message"]);
       }
     }
 

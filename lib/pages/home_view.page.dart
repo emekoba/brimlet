@@ -1,5 +1,5 @@
 import 'package:brimlet/blocs/main.bloc.dart';
-import 'package:brimlet/pages/registration.page.dart';
+import 'package:brimlet/pages/login.page.dart';
 import 'package:brimlet/widgets/op_snack.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,11 +12,11 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     MainBloc mainBloc = Provider.of<MainBloc>(context);
 
-    void _goToRegistration() {
+    void _goToLogin() {
       Navigator.push(
         context,
         CupertinoPageRoute(
-          builder: (_) => const RegistrationPage(),
+          builder: (_) => const LoginPage(),
         ),
       );
     }
@@ -30,7 +30,7 @@ class HomeView extends StatelessWidget {
           text: "Signed Out",
           hue: Colors.green,
         );
-        _goToRegistration();
+        _goToLogin();
       }).onError((error, stackTrace) {
         popSnack(context: context, text: "Sign Out Failed");
       });
@@ -45,7 +45,7 @@ class HomeView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Welcome ${mainBloc.userName}",
+                "Welcome ${mainBloc.user["displayName"]}",
                 style: const TextStyle(
                   color: Colors.redAccent,
                   fontWeight: FontWeight.bold,
@@ -64,7 +64,7 @@ class HomeView extends StatelessWidget {
                           Icons.arrow_left_rounded,
                         ),
                         Text(
-                          "Log Out",
+                          "Sign Out",
                           style: TextStyle(
                             color: Colors.redAccent,
                             fontWeight: FontWeight.bold,

@@ -1,17 +1,19 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:brimlet/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MainBloc extends ChangeNotifier {
   bool _userLoggedIn = false;
   bool _userVerified = true;
-  String _userName = "Russell";
+  dynamic _user = {};
   final String _verificationCode = "423f2";
 
-  String get userName => _userName;
+  Map get user => _user;
   String get verificationCode => _verificationCode;
   bool get userLoggedIn => _userLoggedIn;
   bool get userVerified => _userVerified;
@@ -22,9 +24,19 @@ class MainBloc extends ChangeNotifier {
   }) {
     return firebaseAuth
         .signInWithEmailAndPassword(email: email, password: password)
-        .then((loginData) {
-      _userName = loginData.user!.displayName!;
+        .then((loginData) async {
+      _user = {
+        "displayName": loginData.user!.displayName,
+        "email": loginData.user!.email,
+        "uid": loginData.user!.uid,
+      };
+
       _userLoggedIn = true;
+
+      final SharedPreferences store = await SharedPreferences.getInstance();
+      await store.setString("user", json.encode(_user));
+
+      notifyListeners();
     });
   }
 
@@ -32,7 +44,7 @@ class MainBloc extends ChangeNotifier {
     firebaseAuth.signOut().then((res) {
       _userLoggedIn = false;
       _userVerified = false;
-      _userName = "";
+      _user = {};
       notifyListeners();
     });
   }
@@ -77,19 +89,45 @@ class MainBloc extends ChangeNotifier {
     });
   }
 
-  Future<bool> authenticateWithBiometrics() async {
-    final LocalAuthentication localAuthentication = LocalAuthentication();
-    bool isBiometricSupported = await localAuthentication.isDeviceSupported();
-    bool canCheckBiometrics = await localAuthentication.canCheckBiometrics;
-
+  Future<Map<String, dynamic>> authenticateWithBiometrics() async {
     bool isAuthenticated = false;
+    final SharedPreferences store = await SharedPreferences.getInstance();
+    String? userString = store.getString("user");
+    Map user = {};
 
-    if (isBiometricSupported && canCheckBiometrics) {
-      isAuthenticated = await localAuthentication.authenticate(
-        localizedReason: 'Please complete the biometrics to proceed.',
-      );
+    if (userString != null) {
+      user = json.decode(userString);
     }
 
-    return isAuthenticated;
+    if (user.isNotEmpty) {
+      final LocalAuthentication localAuthentication = LocalAuthentication();
+      bool isBiometricSupported = await localAuthentication.isDeviceSupported();
+      bool canCheckBiometrics = await localAuthentication.canCheckBiometrics;
+
+      if (isBiometricSupported && canCheckBiometrics) {
+        isAuthenticated = await localAuthentication.authenticate(
+          localizedReason: 'Please complete the biometrics to proceed.',
+        );
+      }
+
+      if (isAuthenticated) {
+        _user = user;
+        notifyListeners();
+        return {
+          "isAuthenticated": isAuthenticated,
+          "message": "biometrics failed",
+        };
+      } else {
+        return {
+          "isAuthenticated": isAuthenticated,
+          "message": "biometrics successful",
+        };
+      }
+    } else {
+      return {
+        "isAuthenticated": isAuthenticated,
+        "message": "You Must Login at Least Once to Use Biometrics",
+      };
+    }
   }
 }
