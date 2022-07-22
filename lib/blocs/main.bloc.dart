@@ -7,10 +7,14 @@ import 'package:local_auth/local_auth.dart';
 
 class MainBloc extends ChangeNotifier {
   bool _userLoggedIn = false;
-  String _userName = "";
+  bool _userVerified = true;
+  String _userName = "Russell";
+  final String _verificationCode = "423f2";
 
-  bool get userLoggedIn => _userLoggedIn;
   String get userName => _userName;
+  String get verificationCode => _verificationCode;
+  bool get userLoggedIn => _userLoggedIn;
+  bool get userVerified => _userVerified;
 
   Future ffLogin({
     required String email,
@@ -19,21 +23,18 @@ class MainBloc extends ChangeNotifier {
     return firebaseAuth
         .signInWithEmailAndPassword(email: email, password: password)
         .then((loginData) {
-      print(loginData);
+      _userName = loginData.user!.displayName!;
+      _userLoggedIn = true;
     });
   }
 
-  Future<Map<String, bool>> ffLogout() async {
-    try {
-      firebaseAuth.signOut().then((registrant) {
-        _userLoggedIn = false;
-        _userName = "";
-        notifyListeners();
-      });
-      return {"success": true};
-    } catch (e) {
-      return {"success": false};
-    }
+  Future ffLogout() async {
+    firebaseAuth.signOut().then((res) {
+      _userLoggedIn = false;
+      _userVerified = false;
+      _userName = "";
+      notifyListeners();
+    });
   }
 
   Future<void> ffVerifyUser({
@@ -48,6 +49,16 @@ class MainBloc extends ChangeNotifier {
     }
   }
 
+  bool verifyUser({required String code}) {
+    if (code == _verificationCode) {
+      _userVerified = true;
+    } else {
+      _userVerified = false;
+    }
+
+    return _userVerified;
+  }
+
   Future ffRegisterUser({
     required String name,
     required String email,
@@ -59,13 +70,10 @@ class MainBloc extends ChangeNotifier {
       User user = regData.user!;
       user.updateDisplayName(name);
       if (!user.emailVerified) {
-        print("not verified");
+        log("not verified");
       }
-
-      _userName = name;
-      notifyListeners();
     }).catchError((onError) {
-      print(onError);
+      log(onError);
     });
   }
 
@@ -79,7 +87,6 @@ class MainBloc extends ChangeNotifier {
     if (isBiometricSupported && canCheckBiometrics) {
       isAuthenticated = await localAuthentication.authenticate(
         localizedReason: 'Please complete the biometrics to proceed.',
-        // biometricOnly: true,
       );
     }
 

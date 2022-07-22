@@ -1,6 +1,7 @@
+import 'package:brimlet/blocs/main.bloc.dart';
 import 'package:brimlet/constants.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class AuthenticationWrapper extends StatefulWidget {
   final Function builder;
@@ -15,33 +16,25 @@ class AuthenticationWrapper extends StatefulWidget {
 }
 
 class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
-  FbAuthStates authState = FbAuthStates.signedOut;
+  FbAuthStates authState = FbAuthStates.registeredVerified;
 
   @override
   void initState() {
-    FirebaseAuth.instance.userChanges().listen((User? user) {
-      if (user == null) {
-        setState(() {
-          authState = FbAuthStates.signedOut;
-        });
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      MainBloc mainBloc = Provider.of<MainBloc>(context, listen: false);
+
+      if (firebaseUser == null) {
+        setState(() => authState = FbAuthStates.signedOut);
       } else {
-        setState(() {
-          authState = FbAuthStates.signedIn;
-        });
+        await firebaseUser!.reload();
+
+        if (mainBloc.userVerified) {
+          setState(() => authState = FbAuthStates.registeredVerified);
+        } else {
+          setState(() => authState = FbAuthStates.registeredUnverified);
+        }
       }
     });
-
-    // FirebaseAuth.instance.userChanges().listen((User? user) {
-    //   if (user == null) {
-    //     setState(() {
-    //       authState = FbAuthStates.signedOut;
-    //     });
-    //   } else {
-    //     setState(() {
-    //       authState = FbAuthStates.signedIn;
-    //     });
-    //   }
-    // });
 
     super.initState();
   }

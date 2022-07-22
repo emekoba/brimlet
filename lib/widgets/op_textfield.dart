@@ -19,6 +19,7 @@ class OpTextfield extends StatelessWidget {
   final Function onChange;
   final IconData? icon;
   final bool? useIcon;
+  final bool? centerText;
 
   const OpTextfield({
     Key? key,
@@ -27,12 +28,13 @@ class OpTextfield extends StatelessWidget {
     this.padding,
     this.placeholder,
     this.controller,
-    required this.type,
     this.hintText,
     this.hintStyle,
+    required this.type,
     required this.onChange,
     this.icon,
     this.useIcon,
+    this.centerText = false,
   }) : super(key: key);
 
   @override
@@ -87,7 +89,7 @@ class OpTextfield extends StatelessWidget {
               autocorrect: type == OpTextFieldTypes.password ? false : true,
               obscureText: type == OpTextFieldTypes.password ? true : false,
               onChanged: (String value) => onChange(value),
-              textAlign: TextAlign.center,
+              textAlign: centerText! ? TextAlign.center : TextAlign.left,
               style: Theme.of(context).textTheme.headline6?.copyWith(
                     fontSize: 15,
                     color: Theme.of(context).backgroundColor,

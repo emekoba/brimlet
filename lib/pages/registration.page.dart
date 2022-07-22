@@ -1,7 +1,6 @@
 import 'package:brimlet/blocs/main.bloc.dart';
-import 'package:brimlet/constants.dart';
+import 'package:brimlet/pages/login.page.dart';
 import 'package:brimlet/pages/verification.page.dart';
-import 'package:brimlet/widgets/dismiss_keyboard.dart';
 import 'package:brimlet/widgets/op_button.dart';
 import 'package:brimlet/widgets/op_snack.dart';
 import 'package:brimlet/widgets/op_textfield.dart';
@@ -18,9 +17,9 @@ class RegistrationPage extends StatefulWidget {
 
 class _RegistrationPageState extends State<RegistrationPage> {
   Map<String, String> form = {
-    "name": "Russell",
-    "email": "rjemekoba@gmail.com",
-    "password": "Password1\$",
+    "name": "",
+    "email": "",
+    "password": "",
   };
 
   @override
@@ -40,12 +39,18 @@ class _RegistrationPageState extends State<RegistrationPage> {
       );
     }
 
-    void _register() async {
-      // await firebaseUser!.delete();
-      // print(firebaseUser);
+    void _goToLogin() {
+      Navigator.push(
+        context,
+        CupertinoPageRoute(
+          builder: (_) => const LoginPage(),
+        ),
+      );
+    }
 
-      // await firebaseUser!.reload();
-      if (firebaseUser == null) {
+    void _register() async {
+      // if (firebaseUser == null) {
+      if (form.values.where((element) => element.isEmpty).isEmpty) {
         Future regFuture = mainBloc.ffRegisterUser(
           name: form["name"] as String,
           email: form["email"] as String,
@@ -62,52 +67,73 @@ class _RegistrationPageState extends State<RegistrationPage> {
         }).onError((error, stackTrace) {
           popSnack(context: context, text: "Sign Up Failed");
         });
+        // } else {
+        //   popSnack(context: context, text: "User Already Exists");
+        // }
       } else {
-        popSnack(context: context, text: "User Already Exists");
+        popSnack(context: context, text: "One or More Fields are Empty");
       }
     }
 
     return Scaffold(
-      body: DismissKeyboard(
-        child: Column(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    OpTextfield(
-                      useIcon: true,
-                      type: OpTextFieldTypes.name,
-                      onChange: (val) => _updateForm(val, "name"),
-                    ),
-                    const SizedBox(height: 40),
-                    OpTextfield(
-                      useIcon: true,
-                      type: OpTextFieldTypes.email,
-                      onChange: (val) => _updateForm(val, "email"),
-                    ),
-                    const SizedBox(height: 40),
-                    OpTextfield(
-                      useIcon: true,
-                      type: OpTextFieldTypes.password,
-                      onChange: (val) => _updateForm(val, "password"),
-                    ),
-                    const SizedBox(height: 40),
-                  ],
-                ),
+      body: Column(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  OpTextfield(
+                    useIcon: true,
+                    type: OpTextFieldTypes.name,
+                    onChange: (val) => _updateForm(val, "name"),
+                  ),
+                  const SizedBox(height: 40),
+                  OpTextfield(
+                    useIcon: true,
+                    type: OpTextFieldTypes.email,
+                    onChange: (val) => _updateForm(val, "email"),
+                  ),
+                  const SizedBox(height: 40),
+                  OpTextfield(
+                    useIcon: true,
+                    type: OpTextFieldTypes.password,
+                    onChange: (val) => _updateForm(val, "password"),
+                  ),
+                  const SizedBox(height: 40),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                        onTap: _goToLogin,
+                        child: Row(
+                          children: const [
+                            Text(
+                              "Sign In",
+                              style: TextStyle(
+                                color: Colors.redAccent,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            SizedBox(
-              height: 55,
-              child: OpButton(
-                label: "Sign Up",
-                onPressed: _register,
-              ),
-            )
-          ],
-        ),
+          ),
+          SizedBox(
+            height: 55,
+            child: OpButton(
+              label: "Sign Up",
+              onPressed: _register,
+            ),
+          )
+        ],
       ),
     );
   }
