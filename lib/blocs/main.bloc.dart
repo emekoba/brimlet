@@ -1,6 +1,9 @@
-import 'package:brimlet/services/firebase.service.dart';
+import 'dart:developer';
+
+import 'package:brimlet/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:local_auth/local_auth.dart';
 
 class MainBloc extends ChangeNotifier {
   bool _userLoggedIn = false;
@@ -9,19 +12,15 @@ class MainBloc extends ChangeNotifier {
   bool get userLoggedIn => _userLoggedIn;
   String get userName => _userName;
 
-  Future<Map<String, bool>> ffLogin({
+  Future ffLogin({
     required String email,
     required String password,
-  }) async {
-    try {
-      firebaseAuth
-          .signInWithEmailAndPassword(email: email, password: password)
-          .then((loginData) {});
-
-      return {"success": true};
-    } catch (e) {
-      return {"success": false};
-    }
+  }) {
+    return firebaseAuth
+        .signInWithEmailAndPassword(email: email, password: password)
+        .then((loginData) {
+      print(loginData);
+    });
   }
 
   Future<Map<String, bool>> ffLogout() async {
@@ -34,6 +33,18 @@ class MainBloc extends ChangeNotifier {
       return {"success": true};
     } catch (e) {
       return {"success": false};
+    }
+  }
+
+  Future<void> ffVerifyUser({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    try {
+      await FirebaseAuth.instance.currentUser!.sendEmailVerification();
+    } catch (e) {
+      log(e.toString());
     }
   }
 
@@ -56,5 +67,22 @@ class MainBloc extends ChangeNotifier {
     }).catchError((onError) {
       print(onError);
     });
+  }
+
+  Future<bool> authenticateWithBiometrics() async {
+    final LocalAuthentication localAuthentication = LocalAuthentication();
+    bool isBiometricSupported = await localAuthentication.isDeviceSupported();
+    bool canCheckBiometrics = await localAuthentication.canCheckBiometrics;
+
+    bool isAuthenticated = false;
+
+    if (isBiometricSupported && canCheckBiometrics) {
+      isAuthenticated = await localAuthentication.authenticate(
+        localizedReason: 'Please complete the biometrics to proceed.',
+        // biometricOnly: true,
+      );
+    }
+
+    return isAuthenticated;
   }
 }

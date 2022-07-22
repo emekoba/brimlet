@@ -1,4 +1,4 @@
-import 'package:brimlet/services/firebase.service.dart';
+import 'package:brimlet/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -30,6 +30,18 @@ class _AuthenticationWrapperState extends State<AuthenticationWrapper> {
         });
       }
     });
+
+    // FirebaseAuth.instance.userChanges().listen((User? user) {
+    //   if (user == null) {
+    //     setState(() {
+    //       authState = FbAuthStates.signedOut;
+    //     });
+    //   } else {
+    //     setState(() {
+    //       authState = FbAuthStates.signedIn;
+    //     });
+    //   }
+    // });
 
     super.initState();
   }

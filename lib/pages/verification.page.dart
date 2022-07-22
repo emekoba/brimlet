@@ -1,6 +1,10 @@
 import 'package:brimlet/blocs/main.bloc.dart';
+import 'package:brimlet/pages/login.page.dart';
 import 'package:brimlet/widgets/dismiss_keyboard.dart';
 import 'package:brimlet/widgets/op_button.dart';
+import 'package:brimlet/widgets/op_snack.dart';
+import 'package:brimlet/widgets/op_textfield.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -19,17 +23,14 @@ class _VerificationPageState extends State<VerificationPage> {
     MainBloc mainBloc = Provider.of<MainBloc>(context);
 
     void updateForm(String value) {
-      setState(() {
-        _verificationCode = value;
-      });
+      setState(() => _verificationCode = value);
     }
 
-    void popSnack({required String text}) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(text, style: const TextStyle(color: Colors.redAccent)),
-          duration: const Duration(seconds: 3),
-          backgroundColor: Colors.white,
+    void _goToLogin() {
+      Navigator.push(
+        context,
+        CupertinoPageRoute(
+          builder: (_) => const LoginPage(),
         ),
       );
     }
@@ -51,6 +52,14 @@ class _VerificationPageState extends State<VerificationPage> {
       // } else {
       //   popSnack(text: "User Already Exists");
       // }
+
+      popSnack(
+        context: context,
+        text: "Verification Successful",
+        hue: Colors.green,
+      );
+
+      _goToLogin();
     }
 
     return Scaffold(
@@ -62,12 +71,12 @@ class _VerificationPageState extends State<VerificationPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 30),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    // OpTextfield(
-                    //   useIcon: true,
-                    //   type: OpTextFieldTypes.password,
-                    //   // onChange: (val) => updateForm(val, "password"),
-                    // ),
+                  children: [
+                    OpTextfield(
+                      useIcon: true,
+                      type: OpTextFieldTypes.code,
+                      onChange: (val) => updateForm(val),
+                    ),
                   ],
                 ),
               ),

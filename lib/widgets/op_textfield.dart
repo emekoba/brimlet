@@ -4,6 +4,7 @@ enum OpTextFieldTypes {
   name,
   email,
   password,
+  code,
 }
 
 class OpTextfield extends StatelessWidget {
@@ -48,6 +49,9 @@ class OpTextfield extends StatelessWidget {
           case OpTextFieldTypes.name:
             return Icons.person;
 
+          case OpTextFieldTypes.code:
+            return Icons.verified_outlined;
+
           default:
             return Icons.error;
         }
@@ -83,6 +87,7 @@ class OpTextfield extends StatelessWidget {
               autocorrect: type == OpTextFieldTypes.password ? false : true,
               obscureText: type == OpTextFieldTypes.password ? true : false,
               onChanged: (String value) => onChange(value),
+              textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headline6?.copyWith(
                     fontSize: 15,
                     color: Theme.of(context).backgroundColor,
